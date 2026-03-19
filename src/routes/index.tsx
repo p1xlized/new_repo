@@ -1,46 +1,208 @@
-import { useState } from "react"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { AnimatePresence, motion } from "framer-motion"
+"use client"
+
+import { useState, useEffect, useMemo, useRef } from "react"
+import { createFileRoute } from "@tanstack/react-router"
 import {
-  Browser,
-  FileText,
+  AnimatePresence,
+  motion,
+  useInView,
+  useScroll,
+  useSpring,
+} from "framer-motion"
+import {
+  ShieldCheck,
+  ArrowDown,
+  Planet,
+  Crosshair,
+  Cpu,
   GithubLogo,
-  GlobeHemisphereWest,
-  LinkedinLogo,
+  TrendUp,
+  ChartBar,
+  Layout,
+  Code,
+  Database,
   TerminalWindow,
+  CircuitryIcon,
 } from "@phosphor-icons/react"
-import { Profile, SlotWrapper } from "@/components/Profile"
-import { tools } from "@/data/profile_data"
+
+// Components
+import { Profile } from "@/components/Profile"
 import { SystemLoader } from "@/components/Loader"
-import PinnedProject from "@/components/PinnedCard"
-import { ContactForm } from "@/components/ContactMe"
-import BoxButton from "@/components/BoxButton"
-import ExperienceCard from "@/components/ExperienceCard"
-import { cn } from "@/lib/utils"
+import { ContactSection } from "@/components/ContactMe"
 
 export const Route = createFileRoute("/")({ component: App })
-const links = [
-  {
-    name: "GitHub",
-    icon: <GithubLogo size={20} />,
-    href: "https://github.com/yourusername",
-  },
-  {
-    name: "LinkedIn",
-    icon: <LinkedinLogo size={20} />,
-    href: "https://linkedin.com/in/yourusername",
-  },
-  { name: "Upworks", icon: <Browser size={20} />, href: "/projects" },
-  { name: "Resume", icon: <FileText size={20} />, href: "/resume.pdf" },
-]
+
+const STATS_DATA = {
+  tools: [
+    { name: "React / Next.js", icon: <Layout size={18} />, level: 95 },
+    { name: "TypeScript", icon: <Code size={18} />, level: 90 },
+    { name: "Node.js / Go", icon: <TerminalWindow size={18} />, level: 85 },
+    { name: "PostgreSQL", icon: <Database size={18} />, level: 88 },
+  ],
+  github: [
+    {
+      label: "Total Contributions",
+      value: "2,400+",
+      icon: <TrendUp size={16} />,
+    },
+    {
+      label: "Active Repositories",
+      value: "34",
+      icon: <GithubLogo size={16} />,
+    },
+    { label: "System Uptime", value: "99.9%", icon: <ChartBar size={16} /> },
+  ],
+}
+
+// --- SUB-COMPONENTS ---
+
+const StatsSection = () => (
+  <div className="grid h-full w-full max-w-6xl grid-cols-1 gap-8 p-6 md:grid-cols-12 md:p-12">
+    <div className="flex flex-col gap-6 md:col-span-7">
+      <div className="flex items-center gap-3 border-b border-primary/20 pb-4">
+        <Cpu size={28} className="animate-pulse text-primary" />
+        <h2 className="text-xl font-bold tracking-[0.2em] uppercase">
+          Tech_Capabilities
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {STATS_DATA.tools.map((tool) => (
+          <motion.div
+            key={tool.name}
+            whileHover={{
+              scale: 1.02,
+              backgroundColor: "rgba(var(--primary-rgb), 0.1)",
+            }}
+            className="group relative overflow-hidden border border-primary/10 bg-primary/5 p-5 transition-all"
+          >
+            <div className="mb-4 flex items-center gap-3 text-primary/60 group-hover:text-primary">
+              {tool.icon}
+              <span className="text-[11px] font-bold tracking-widest uppercase">
+                {tool.name}
+              </span>
+            </div>
+            <div className="h-1.5 w-full bg-primary/10">
+              <motion.div
+                initial={{ width: 0 }}
+                whileInView={{ width: `${tool.level}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-primary shadow-[0_0_15px_var(--primary)]"
+              />
+            </div>
+            <span className="mt-2 block text-right text-[8px] font-bold tracking-tighter text-primary/30 uppercase">
+              Mastery_Index: {tool.level}%
+            </span>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+
+    <div className="flex flex-col gap-6 md:col-span-5">
+      <div className="flex items-center gap-3 border-b border-primary/20 pb-4">
+        <GithubLogo size={28} className="text-primary" />
+        <h2 className="text-xl font-bold tracking-[0.2em] uppercase">
+          Uplink_Stats
+        </h2>
+      </div>
+      <div className="flex flex-1 flex-col gap-4">
+        {STATS_DATA.github.map((stat) => (
+          <div
+            key={stat.label}
+            className="flex flex-col border-l-2 border-primary/20 bg-primary/[0.02] p-5 transition-all hover:border-primary hover:bg-primary/5"
+          >
+            <div className="mb-1 flex items-center gap-2 text-primary/40">
+              {stat.icon}
+              <span className="text-[10px] font-bold tracking-widest uppercase">
+                {stat.label}
+              </span>
+            </div>
+            <span className="text-4xl font-bold tracking-tighter text-foreground tabular-nums">
+              {stat.value}
+            </span>
+          </div>
+        ))}
+        <div className="relative mt-auto hidden h-32 w-full overflow-hidden border border-primary/10 bg-primary/5 p-4 md:block">
+          <div className="absolute inset-0 flex items-center justify-center opacity-10">
+            <CircuitryIcon size={64} className="animate-pulse text-primary" />
+          </div>
+          <div className="animate-scanline absolute inset-0 bg-[linear-gradient(transparent_0%,theme(colors.primary.DEFAULT/0.05)_50%,transparent_100%)] bg-[size:100%_4px]" />
+          <span className="absolute bottom-2 left-2 text-[8px] font-bold tracking-widest text-primary/40 uppercase">
+            Live_Diagnostics_Pulse
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+)
+
+// --- MAIN APP COMPONENT ---
+
 function App() {
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [time, setTime] = useState("")
+  const [activeSection, setActiveSection] = useState("INITIALIZING")
+  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null)
+
+  const { scrollYProgress } = useScroll({
+    container: containerRef ? { current: containerRef } : undefined,
+  })
+
+  const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 30 })
+
+  // Clock
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString("en-GB", { hour12: false }))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Section Observer Logic
+  useEffect(() => {
+    if (!containerRef) return
+    const options = { threshold: 0.5 }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id.replace("-module", "").toUpperCase())
+        }
+      })
+    }, options)
+
+    const sections = containerRef.querySelectorAll("section")
+    sections.forEach((s) => observer.observe(s))
+    return () => observer.disconnect()
+  }, [containerRef, loading])
+
+  const scrollToNext = () => {
+    containerRef?.scrollBy({ top: window.innerHeight, behavior: "smooth" })
+  }
 
   return (
-    <>
-      {/* 1. Loader Overlay */}
-      <AnimatePresence>
+    <div className="relative min-h-screen overflow-hidden bg-background font-sans text-foreground selection:bg-primary/30">
+      {/* ENHANCED SIDEBAR PROGRESS (NAV_POS) */}
+      {!loading && (
+        <div className="fixed top-1/2 right-4 z-[60] flex h-48 w-4 -translate-y-1/2 flex-col items-center gap-3 md:right-8 md:h-80 md:w-6">
+          <span className="text-[8px] font-black tracking-[0.4em] text-primary uppercase [writing-mode:vertical-lr]">
+            NAV_SYSTEM
+          </span>
+          <div className="relative w-[3px] flex-1 border-x border-primary/5 bg-primary/10 md:w-[6px]">
+            <motion.div
+              className="absolute top-0 w-full bg-primary shadow-[0_0_20px_var(--primary)]"
+              style={{ scaleY, originY: 0, height: "100%" }}
+            />
+            {/* Tick Marks */}
+            <div className="absolute inset-y-0 -left-1 flex flex-col justify-between py-2 text-[6px] text-primary/20">
+              <span>01</span>
+              <span>02</span>
+              <span>03</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LOADER */}
+      <AnimatePresence mode="wait">
         {loading && (
           <motion.div
             key="loader"
@@ -48,228 +210,190 @@ function App() {
               scaleY: 0,
               transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
             }}
-            className="fixed inset-0 z-[100] origin-top"
+            className="fixed inset-0 z-[100] origin-top bg-background"
           >
             <SystemLoader onComplete={() => setLoading(false)} />
           </motion.div>
         )}
       </AnimatePresence>
-      <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-background p-2 sm:p-4 md:p-8">
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.05]" />
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: loading ? 0 : 1, scale: loading ? 0.98 : 1 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className={cn(
-            "bg-card relative z-10 flex w-full max-w-7xl flex-col overflow-hidden border border-primary/20 shadow-2xl transition-colors duration-500 hover:border-primary/40",
-            "mt-12 h-[92dvh] md:mt-0 md:h-[85vh]"
-          )}
-        >
-          <div className="flex flex-1 flex-col overflow-hidden p-3 md:p-8">
-            <Profile
-              title="A. Paduret"
-              avatarSrc="/assets/imgs/avatar.jpg"
-              tools={tools}
-            >
-              <SlotWrapper className="bg-muted/5 dark:bg-card/40 flex flex-col overflow-hidden border-primary/10 lg:col-span-2">
-                <div className="flex h-full flex-col p-4 2xl:p-8">
-                  <div className="custom-scrollbar flex-1 space-y-6 overflow-y-auto pr-2 2xl:space-y-10">
-                    {/* WORK HISTORY SECTION */}
-                    <section>
-                      <div className="mb-3 flex items-center gap-2 border-b border-primary/10 pb-2 text-[9px] font-black tracking-[0.2em] text-primary/50 uppercase 2xl:text-[11px]">
-                        <span className="size-1 bg-primary 2xl:size-1.5" />{" "}
-                        WORK_HISTORY
-                      </div>
-                      <div className="space-y-1 2xl:space-y-2">
-                        <ExperienceCard
-                          variant="freelance"
-                          title="Remote"
-                          subtitle="Freelance Engineer"
-                          location="GLO"
-                          date="25-PRS"
-                        />
-                        <ExperienceCard
-                          variant="work"
-                          title="Phonia"
-                          subtitle="Full Stack Dev"
-                          location="FI"
-                          date="24-25"
-                        />
-                      </div>
-                    </section>
-
-                    {/* ACADEMIC LOG SECTION */}
-                    <section>
-                      <div className="mb-3 flex items-center gap-2 border-b border-primary/10 pb-2 text-[9px] font-black tracking-[0.2em] text-primary/50 uppercase 2xl:text-[11px]">
-                        <span className="size-1 bg-primary 2xl:size-1.5" />{" "}
-                        ACADEMIC_LOG
-                      </div>
-                      <div className="space-y-1 2xl:space-y-2">
-                        <ExperienceCard
-                          variant="study"
-                          title="UEF"
-                          subtitle="BSc Comp Sci"
-                          location="FI"
-                          date="25-PRS"
-                        />
-                        <ExperienceCard
-                          variant="degree"
-                          title="C. Maisonneuve"
-                          subtitle="Software Dev"
-                          location="CA"
-                          date="21-24"
-                        />
-                      </div>
-                    </section>
-                  </div>
-
-                  {/* SYSTEM FOOTER */}
-                  <div className="text-muted-foreground/20 mt-auto hidden justify-between border-t border-primary/5 pt-4 text-[8px] font-bold uppercase md:flex 2xl:text-[10px]">
-                    <span>SYS_NODE_v1.0 // ACTIVE</span>
-                    <span>RENDER_MODE: OPTIMIZED_ULTRAWIDE</span>
-                  </div>
-                </div>
-              </SlotWrapper>
-
-              {/* RIGHT COLUMN */}
-              <div className="flex flex-col gap-3 overflow-hidden">
-                <SlotWrapper className="bg-muted/10 dark:bg-card/40 flex h-40 shrink-0 items-center justify-center overflow-hidden border-primary/10 md:h-auto md:flex-[2]">
-                  <BoxButton
-                    title="Contact_Operator"
-                    label="ESTABLISH_UPLINK"
-                    gifSrc="/assets/gifs/project-hero.gif"
-                    onClick={() => {
-                      const contactSection = document.getElementById("contact")
-                      if (contactSection) {
-                        contactSection.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        })
-                      }
-                    }}
-                  />
-                </SlotWrapper>
-
-                <SlotWrapper className="bg-muted/10 dark:bg-card/30 flex shrink-0 flex-col border-primary/20 p-3 md:p-4">
-                  {/* DIRECTORY HEADER - Simplified for icon-only layout */}
-                  <div className="mb-4 flex items-center gap-2 text-[9px] font-bold tracking-[0.3em] text-primary uppercase">
-                    <div className="flex items-center justify-center gap-1.5 border border-primary/20 bg-primary/10 px-2 py-1">
-                      <TerminalWindow size={12} weight="bold" />
-                      <span>NODES</span>
-                    </div>
-                    <div className="h-[1px] flex-1 bg-primary/20" />
-                  </div>
-
-                  {/* Icon Grid Container - Centered on all screens */}
-                  <div className="flex flex-row flex-wrap items-center justify-center gap-4">
-                    {links.map((link) => (
-                      <a
-                        key={link.name}
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={link.name} // Keeps the name visible on hover tooltip
-                        className="group relative flex transition-all duration-200"
-                      >
-                        {/* FOLDER/SLOT ICON CONTAINER
-                            - Consistent sizing (h-10) for all platforms
-                        */}
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center border border-primary/20 bg-primary/[0.03] transition-all group-hover:border-primary/50 group-hover:bg-primary/10">
-                          {/* Decorative folder tab */}
-                          <div className="absolute -top-[1px] left-0 h-[2px] w-3 bg-primary/40 group-hover:bg-primary" />
-
-                          <div className="relative z-10 text-primary/60 transition-colors group-hover:text-primary">
-                            <div className="size-5">{link.icon}</div>
-                          </div>
-
-                          {/* Hover Glow Effect */}
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.15)_0%,transparent_70%)] opacity-0 transition-opacity group-hover:opacity-100" />
-
-                          {/* Subtle corner accent on hover */}
-                          <div className="absolute right-0 bottom-0 h-1 w-1 bg-primary/0 transition-colors group-hover:bg-primary/40" />
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </SlotWrapper>
-              </div>
-            </Profile>
+      {/* GLOBAL HUD */}
+      <div className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-between p-4 antialiased md:p-10">
+        <header className="mt-2 flex items-start justify-between">
+          <div className="flex flex-col gap-1 border-l-2 border-primary/60 pl-4">
+            <span className="text-[9px] font-bold tracking-[0.3em] text-primary uppercase">
+              SCTR_COORDS: 62.8925° N, 27.6770° E
+            </span>
+            <span className="text-[8px] tracking-widest text-primary/40 uppercase">
+              NODE_KUOPIO_STABLE
+            </span>
           </div>
 
-          {/* BOTTOM STATUS BAR */}
-          <div className="bg-muted/30 flex shrink-0 items-center justify-between border-t border-primary/10 px-4 py-2 text-[8px] font-bold tracking-tighter uppercase md:tracking-widest">
-            <div className="flex gap-4 opacity-60">
-              <span>KUOPIO, FI</span>
-              <span className="hidden sm:inline">62.8924 N</span>
-            </div>
-            <div className="flex gap-4">
-              <span className="animate-pulse text-primary">● STABLE_LINK</span>
-              <span className="xs:inline hidden text-[7px] italic opacity-20">
-                v1.0.4-LATEST
+          {/* DYNAMIC SECTION DECODER (Replaces Radar) */}
+          <div className="flex flex-col items-end border-r-2 border-primary/60 pr-4">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+              <span className="text-[10px] font-black tracking-[0.3em] text-primary uppercase">
+                ACTIVE_MODULE: {activeSection}
               </span>
             </div>
+            <p className="text-[14px] font-bold text-foreground tabular-nums opacity-80">
+              {time}
+            </p>
           </div>
-        </motion.div>
-      </main>
-      <main
-        id="contact"
-        className="relative mt-12 flex min-h-screen items-center justify-center overflow-hidden bg-background p-4"
-      >
-        {/* --- MULTI-PLANET ORBITAL SYSTEM --- */}
-        <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center">
-          {/* Increased base size for 2xl screens */}
-          <div className="relative h-[600px] w-[600px] md:h-[900px] md:w-[900px] 2xl:h-[1200px] 2xl:w-[1200px]">
-            {/* 1. CENTRAL SUN / SYSTEM CORE */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* Inner Core */}
-              <div className="h-32 w-32 rounded-full bg-primary/10 blur-2xl md:h-48 md:w-48" />
-              {/* Outer Glow */}
-              <div className="absolute h-64 w-64 rounded-full bg-[radial-gradient(circle_at_center,rgba(var(--primary),0.08)_0%,transparent_70%)] blur-3xl" />
-            </div>
+        </header>
 
-            {/* 2. INNER PLANET (Fast, Close) */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-[25%] rounded-full border border-primary/5"
-            >
-              <div className="absolute -top-1 left-1/2 h-2 w-2 rounded-full bg-primary/40 shadow-[0_0_10px_rgba(var(--primary),0.4)]" />
-            </motion.div>
-
-            {/* 3. MID-ZONE PLANET (Medium Speed) */}
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-[15%] rounded-full border border-primary/10"
-            >
-              {/* The "Planet" */}
-              <div className="absolute top-1/2 -left-3 h-5 w-5 rounded-full border border-primary/20 bg-background shadow-[inset_0_0_10px_rgba(var(--primary),0.2)]">
-                {/* Internal Detail */}
-                <div className="absolute inset-1 animate-pulse rounded-full bg-primary/10" />
-              </div>
-            </motion.div>
-
-            {/* 5. ASTEROID RING (Static Decor) */}
-            <div className="absolute inset-0 opacity-10">
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute h-full w-full"
-                  style={{ transform: `rotate(${i * 60}deg)` }}
-                >
-                  <div className="absolute top-0 left-1/2 h-[1px] w-20 bg-gradient-to-r from-primary/50 to-transparent" />
-                </div>
-              ))}
+        <footer className="flex items-end justify-between border-t border-primary/10 pt-6">
+          <div className="flex flex-col gap-1">
+            <span className="text-[9px] font-black tracking-[0.5em] text-primary/80 uppercase">
+              PIXLIZED_OS_v1.0.4
+            </span>
+            <div className="h-1 w-32 bg-primary/10">
+              <motion.div
+                className="h-full bg-primary/40"
+                style={{ width: "40%" }}
+              />
             </div>
           </div>
+          <div className="flex items-center gap-3 text-primary">
+            <ShieldCheck
+              size={24}
+              weight="bold"
+              className="drop-shadow-[0_0_5px_var(--primary)]"
+            />
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-80">
+              SECURE_UPLINK_ESTABLISHED
+            </span>
+          </div>
+        </footer>
+      </div>
+
+      {!loading && (
+        <div
+          ref={setContainerRef}
+          className="hide-scrollbar relative z-10 h-screen w-full snap-y snap-mandatory overflow-y-auto scroll-smooth"
+        >
+          {/* SECTION 1: PROFILE */}
+          <section
+            id="profile-module"
+            className="relative flex min-h-screen w-full snap-start items-center justify-center overflow-hidden bg-background px-4"
+          >
+            <SystemGridBackground />
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="relative w-full max-w-6xl"
+            >
+              <Profile />
+            </motion.div>
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+              <button
+                onClick={scrollToNext}
+                className="group flex flex-col items-center gap-2"
+              >
+                <span className="text-[8px] font-bold tracking-[0.3em] text-primary/40 uppercase">
+                  Intelligence_Module
+                </span>
+                <ArrowDown size={20} className="animate-bounce text-primary" />
+              </button>
+            </div>
+          </section>
+
+          {/* SECTION 2: STATS */}
+          <section
+            id="stats-module"
+            className="relative flex min-h-screen w-full snap-start items-center justify-center overflow-hidden bg-background"
+          >
+            <SystemGridBackground />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="relative z-10 flex w-full justify-center"
+            >
+              <StatsSection />
+            </motion.div>
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+              <button
+                onClick={scrollToNext}
+                className="group flex flex-col items-center gap-2"
+              >
+                <span className="text-[8px] font-bold tracking-[0.3em] text-primary/40 uppercase">
+                  Contact_Protocol
+                </span>
+                <ArrowDown size={20} className="text-primary" />
+              </button>
+            </div>
+          </section>
+
+          {/* SECTION 3: CONTACT */}
+          <section
+            id="contact-module"
+            className="relative flex min-h-screen w-full snap-start items-center justify-center overflow-hidden bg-background"
+          >
+            <SidebarSystemBackground />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="relative z-20 w-full max-w-4xl"
+            >
+              <ContactSection />
+            </motion.div>
+          </section>
         </div>
+      )}
 
-        {/* Form Content */}
-        <SlotWrapper className="z-10 w-full max-w-5xl backdrop-blur-[2px]">
-          <ContactForm />
-        </SlotWrapper>
-      </main>
-    </>
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes scanline { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+        .animate-scanline { animation: scanline 3s linear infinite; }
+        .animate-orbit-clock { animation: orbit-clock 25s linear infinite; }
+      `}</style>
+    </div>
   )
 }
+
+const SystemGridBackground = () => (
+  <div className="pointer-events-none absolute inset-0 z-0 bg-background">
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,theme(colors.primary.DEFAULT/0.03)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.primary.DEFAULT/0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,theme(colors.background.DEFAULT)_90%)]" />
+  </div>
+)
+
+const SidebarSystemBackground = () => {
+  const debris = useMemo(
+    () =>
+      [...Array(8)].map((_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        duration: 20 + Math.random() * 10,
+      })),
+    []
+  )
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute top-1/2 -right-32 h-[500px] w-[500px] -translate-y-1/2 opacity-20 md:h-[800px] md:w-[800px]">
+        <div className="relative h-full w-full">
+          <div className="animate-orbit-clock absolute inset-0 rounded-full border-2 border-dashed border-primary/20" />
+          <div className="absolute top-1/2 left-1/2 flex h-32 w-32 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-primary/30 bg-background">
+            <Planet size={64} weight="fill" className="text-primary" />
+          </div>
+        </div>
+      </div>
+      {debris.map((d) => (
+        <motion.div
+          key={d.id}
+          initial={{ left: `${d.x}%`, top: `${d.y}%` }}
+          animate={{ y: [0, -30, 0], opacity: [0.05, 0.1, 0.05] }}
+          transition={{ duration: d.duration, repeat: Infinity }}
+          className="absolute text-primary"
+        >
+          <Crosshair size={12} />
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+
+export default App

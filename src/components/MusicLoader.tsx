@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -11,7 +9,7 @@ interface MusicLoaderProps {
 
 export const MusicLoader = ({
   onComplete,
-  speed = 30,
+  speed = 10,
   title = "AUDIO_SYNTH_v1.0",
 }: MusicLoaderProps) => {
   const [progress, setProgress] = useState(0)

@@ -1,145 +1,164 @@
-import { useEffect, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
+"use client"
+
+import React from "react"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 interface SystemLoaderProps {
   onComplete?: () => void
-  /** Array of strings to cycle through during load */
-  statusMessages?: Array<string>
-  /** Duration in milliseconds for each 1% of progress (default: 25) */
-  speed?: number
-  /** Title displayed above the status (default: SYS_LOAD_v3.0) */
-  title?: string
+  duration?: number // Time in seconds
 }
 
-export const SystemLoader = ({
-  onComplete,
-  statusMessages = [
-    "INITIALIZING_KERNEL",
-    "LOADING_VIRTUAL_DOM",
-    "ESTABLISHING_UPLINK",
-    "DECRYPTING_ASSETS",
-    "SYSTEM_READY",
-  ],
-  speed = 25,
-  title = "SYS_LOAD_v3.0",
-}: SystemLoaderProps) => {
-  const [progress, setProgress] = useState(0)
-  const [statusIndex, setStatusIndex] = useState(0)
-
-  useEffect(() => {
-    // 1. Progress Logic
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer)
-          if (onComplete) {
-            setTimeout(onComplete, 600)
-          }
-          return 100
-        }
-        return prev + 1
-      })
-    }, speed)
-
-    // 2. Dynamic Status Logic
-    // Aligns message changes with the total loading duration
-    const totalDuration = speed * 100
-    const statusInterval = totalDuration / statusMessages.length
-
-    const statusTimer = setInterval(() => {
-      setStatusIndex((prev) =>
-        prev < statusMessages.length - 1 ? prev + 1 : prev
-      )
-    }, statusInterval)
-
-    return () => {
-      clearInterval(timer)
-      clearInterval(statusTimer)
-    }
-  }, [onComplete, speed, statusMessages.length])
-
+function SystemLoader({ onComplete, duration = 1.5 }: SystemLoaderProps) {
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-background font-mono text-primary">
-      <div className="relative w-72">
-        {/* HUD Target Corners - Error-free flicker effect */}
-        <div className="absolute -inset-8">
-          <motion.div
-            animate={{
-              opacity: [0.2, 1, 0.4, 1, 0.2], // Manual "stepped" flickering
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-              ease: "linear",
-            }}
-          >
-            <div className="absolute top-0 left-0 size-6 border-t-2 border-l-2 border-primary" />
-            <div className="absolute top-0 right-0 size-6 border-t-2 border-r-2 border-primary" />
-            <div className="absolute bottom-0 left-0 size-6 border-b-2 border-l-2 border-primary" />
-            <div className="absolute right-0 bottom-0 size-6 border-r-2 border-b-2 border-primary" />
-          </motion.div>
-        </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-background font-mono"
+    >
+      {/* HUD GRID RADIANCE */}
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00ff9d12_1px,transparent_1px),linear-gradient(to_bottom,#00ff9d12_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.05]" />
 
-        {/* Header & Percentage */}
-        <div className="mb-2 flex items-end justify-between">
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold tracking-widest uppercase opacity-50">
-              {title}
-            </span>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={statusIndex}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                className="text-xs font-black tracking-tighter"
-              >
-                {statusMessages[statusIndex]}
-              </motion.span>
-            </AnimatePresence>
-          </div>
-          <span className="text-4xl font-black tracking-tighter tabular-nums">
-            {progress}%
-          </span>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="relative h-4 w-full border-2 border-primary/30 p-0.5">
-          <motion.div
-            className="h-full bg-primary"
-            initial={{ width: "0%" }}
-            animate={{ width: `${progress}%` }}
-            transition={{ ease: "linear", duration: 0.1 }}
-          />
-
-          {/* Scanning Line Effect */}
-          <motion.div
-            animate={{ left: ["-10%", "110%"] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="pointer-events-none absolute top-0 bottom-0 w-12 bg-white/10 blur-md"
-          />
-        </div>
-
-        {/* Footer Metadata */}
-        <div className="mt-4 flex justify-between text-[8px] font-bold uppercase opacity-40">
+      <div className="relative w-72 space-y-6">
+        <div className="flex items-end justify-between text-[10px] tracking-[0.3em] text-primary uppercase">
           <div className="flex flex-col gap-1">
-            <span>MEM_BLOCK: 0x8F2A</span>
-            <span>UPLINK: STABLE</span>
-          </div>
-          <div className="text-right">
-            <span>LOC: EARTH_SOL</span>
+            <span className="text-[7px] font-bold tracking-widest italic opacity-30">
+              System_Init
+            </span>
             <motion.span
-              animate={{ opacity: [1, 0, 1] }}
-              transition={{ repeat: Infinity, duration: 0.8 }}
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
+              className="font-black drop-shadow-[0_0_12px_rgba(var(--primary-rgb),0.9)]"
             >
-              _
+              Uplink_Active...
             </motion.span>
           </div>
+          <motion.span className="font-black text-primary/80">
+            [100%]
+          </motion.span>
+        </div>
+
+        {/* PROGRESS BAR - HEAVY GLOW NO BORDER */}
+        <div className="relative h-[2px] w-full bg-primary/5">
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{
+              duration: duration,
+              ease: [0.65, 0, 0.35, 1],
+              delay: 0.1,
+            }}
+            onAnimationComplete={onComplete}
+            className="h-full w-full origin-left bg-primary shadow-[0_0_25px_rgba(var(--primary-rgb),0.8),0_0_50px_rgba(var(--primary-rgb),0.3)]"
+          />
+        </div>
+
+        {/* DATA TAGS */}
+        <div className="flex flex-wrap gap-4">
+          {["CORE", "NET", "ARCH", "SYNC"].map((s, i) => (
+            <motion.div
+              key={s}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              transition={{ delay: (duration / 4) * i }}
+              className="flex items-center gap-2"
+            >
+              <div className="h-[1px] w-2 bg-primary/40" />
+              <span className="text-[9px] font-black tracking-tighter">
+                {s}
+              </span>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* CRT Scanline Overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] opacity-10" />
-    </div>
+      {/* AMBIENT SCANLINE */}
+      <motion.div
+        animate={{ y: ["-100%", "1000%"] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[25vh] bg-gradient-to-b from-transparent via-primary/10 to-transparent opacity-40 blur-md"
+      />
+    </motion.div>
   )
 }
+
+function DataUplink({
+  onComplete,
+  mode,
+}: {
+  onComplete: () => void
+  mode: "uplink" | "downlink"
+}) {
+  const hexCode = React.useMemo(
+    () =>
+      Math.floor(Math.random() * 0xffffff)
+        .toString(16)
+        .toUpperCase()
+        .padStart(4, "0"),
+    []
+  )
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[150] flex flex-col items-center justify-center bg-background/95 font-mono backdrop-blur-3xl"
+    >
+      <div className="relative w-96 space-y-12">
+        {/* HEADER BLOCK */}
+        <div className="flex items-end justify-between border-b border-primary/10 pb-4">
+          <div className="space-y-1">
+            <div className="text-[7px] font-black tracking-[0.5em] text-primary/20 uppercase">
+              Kernel_Module // 0{hexCode}
+            </div>
+            <div className="text-[14px] font-black tracking-[0.4em] text-primary uppercase drop-shadow-[0_0_15px_rgba(var(--primary-rgb),0.6)]">
+              {mode === "uplink" ? "Establish_Archive" : "Return_To_Root"}
+            </div>
+          </div>
+          <div className="mr-4 h-6 w-[1px] bg-primary/20" />
+        </div>
+
+        {/* PROGRESS UNIT */}
+        <div className="space-y-3">
+          <div className="relative h-[3px] w-full bg-primary/5">
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.8, ease: [0.8, 0, 0.2, 1] }}
+              onAnimationComplete={onComplete}
+              className={cn(
+                "h-full w-full bg-primary shadow-[0_0_30px_rgba(var(--primary-rgb),0.9)]",
+                mode === "downlink" ? "origin-right" : "origin-left"
+              )}
+            />
+          </div>
+          <div className="flex justify-between text-[6px] font-black tracking-[0.4em] text-primary/30">
+            <span>STREAMS_ACTIVE</span>
+            <span>TRANSFER_ID_{hexCode}</span>
+          </div>
+        </div>
+
+        {/* LOG STRINGS */}
+        <div className="grid grid-cols-2 gap-x-12 gap-y-4 text-[8px] text-primary uppercase">
+          {[
+            "SECURE_VIRTUAL_LAYER",
+            "INDEXING_ASSET_CACHE",
+            "NODAL_SYNCHRONIZATION",
+            "MAPPING_FS_STRUCTURE",
+          ].map((text) => (
+            <div key={text} className="flex items-center gap-3">
+              <div className="h-[2px] w-[2px] animate-pulse bg-primary" />
+              <span className="font-bold tracking-tight opacity-30">
+                {text}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+export { DataUplink, SystemLoader }

@@ -1,218 +1,231 @@
-import { useState } from "react"
-import { ValidationError, useForm } from "@formspree/react"
+"use client"
+
+import { useForm } from "@formspree/react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  CheckCircle,
   PaperPlaneTilt,
   TerminalWindow,
+  Target,
+  CaretRight,
+  Cpu,
+  ShieldCheck,
+  CheckCircle,
 } from "@phosphor-icons/react"
 
-export const ContactForm = () => {
-  const [state, handleSubmit] = useForm("YOUR_FORMSPREE_ID") // Replace with your ID
-  const [isHovered, setIsHovered] = useState(false)
+export const ContactSection = () => {
+  const [state, handleSubmit] = useForm("YOUR_FORMSPREE_ID")
 
-  if (state.succeeded) {
-    return (
-      <div className="flex h-[400px] flex-col items-center justify-center space-y-4 border-2 border-primary bg-primary/5 font-mono text-primary">
-        <CheckCircle size={48} weight="duotone" className="animate-bounce" />
-        <h2 className="text-2xl font-black tracking-tighter uppercase">
-          Message_Transmitted
-        </h2>
-        <p className="text-[10px] opacity-60">
-          UPLINK STABLE // EXPECT RESPONSE WITHIN 24H
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 border border-primary px-4 py-2 text-[10px] font-bold transition-all hover:bg-primary hover:text-black"
-        >
-          SEND_NEW_SIGNAL
-        </button>
-      </div>
-    )
+  const itemVariants = {
+    hidden: { x: -5, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
   }
 
   return (
-    <section
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="relative mx-auto max-w-4xl overflow-hidden p-8 font-mono text-primary transition-colors duration-500"
-    >
-      {/* --- GIF BACKGROUND OVERLAY (Brighter Version) --- */}
-      <AnimatePresence>
-        {isHovered && (
+    <section className="bg-card/40 relative mx-auto w-full border border-primary/10 p-4 font-mono text-primary shadow-2xl backdrop-blur-xl">
+      {/* --- UNIFIED PROFILE-STYLE DECORATIONS --- */}
+      {/* TOP-LEFT DATA STREAM */}
+      <div className="absolute -top-[1px] left-4 flex items-center gap-2 md:left-8">
+        <div className="h-[2px] w-8 bg-primary shadow-[0_0_10px_var(--primary)] md:w-12" />
+        <span className="text-[6px] font-black tracking-[0.2em] text-primary/60 md:text-[7px] md:tracking-[0.3em]">
+          UPLINK_ESTABLISHED
+        </span>
+      </div>
+
+      {/* SIDE FRAME BRACES - Hidden on Mobile */}
+      <div className="absolute inset-y-8 -left-[1px] hidden w-[1px] bg-gradient-to-b from-transparent via-primary/40 to-transparent md:block" />
+      <div className="absolute inset-y-8 -right-[1px] hidden w-[1px] bg-gradient-to-b from-transparent via-primary/40 to-transparent md:block" />
+
+      {/* BOTTOM-RIGHT INDEX */}
+      <div className="absolute right-4 -bottom-[1px] flex items-center gap-2 md:right-8">
+        <span className="text-[6px] font-black tracking-[0.2em] text-primary/60 md:text-[7px] md:tracking-[0.3em]">
+          TRNSMSN_V1.0.4
+        </span>
+        <div className="h-[2px] w-8 bg-primary shadow-[0_0_10px_var(--primary)] md:w-12" />
+      </div>
+      {/* --------------------------------------- */}
+
+      <AnimatePresence mode="wait">
+        {state.succeeded ? (
           <motion.div
+            key="success"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="pointer-events-none absolute inset-0 z-0"
+            className="mt-2 flex h-[450px] flex-col items-center justify-center p-6 text-center"
           >
-            <img
-              src="/assets/heros/project-hero.gif"
-              alt="Background Decor"
-              className="h-full w-full object-cover opacity-30 brightness-75 contrast-125 grayscale"
+            <CheckCircle
+              size={60}
+              weight="duotone"
+              className="mb-4 animate-pulse"
             />
-            {/* Blending the brighter GIF with the TUI Scanline effect */}
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px]" />
+            <h2 className="text-2xl font-black tracking-tighter uppercase italic">
+              Uplink_Confirmed
+            </h2>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-6 border border-primary px-6 py-2 text-[10px] font-black transition-all hover:bg-primary hover:text-black"
+            >
+              RESTART_TERMINAL
+            </button>
           </motion.div>
+        ) : (
+          <div className="flex flex-col lg:flex-row">
+            {/* LEFT: FORM SECTION */}
+            <div className="flex-1 p-6 sm:p-8 md:p-12">
+              <header className="mb-8 flex items-center justify-between border-b border-primary/10 pb-4">
+                <div className="flex items-center gap-2">
+                  <TerminalWindow size={20} weight="fill" />
+                  <h1 className="text-lg font-black tracking-tighter uppercase italic">
+                    Secure_Uplink
+                  </h1>
+                </div>
+                <div className="flex items-center gap-2 text-[9px] font-bold opacity-50">
+                  <ShieldCheck size={14} /> <span>SSL_ACTIVE</span>
+                </div>
+              </header>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                  <motion.div variants={itemVariants} className="space-y-2">
+                    <label
+                      className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
+                      htmlFor="email"
+                    >
+                      <CaretRight size={12} weight="bold" /> 01_Origin
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      className="w-full border-b border-primary/20 bg-transparent py-1 text-sm font-bold text-white transition-all placeholder:opacity-10 focus:border-primary focus:outline-none"
+                      placeholder="USER@DOMAIN.COM"
+                      required
+                    />
+                  </motion.div>
+
+                  <motion.div variants={itemVariants} className="space-y-2">
+                    <label
+                      className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
+                      htmlFor="subject"
+                    >
+                      <CaretRight size={12} weight="bold" /> 02_Protocol
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      className="w-full border-b border-primary/20 bg-transparent py-1 text-sm font-bold text-white focus:border-primary focus:outline-none"
+                    >
+                      <option value="dev" className="bg-black">
+                        FULL_STACK
+                      </option>
+                      <option value="sys" className="bg-black">
+                        ARCHITECTURE
+                      </option>
+                      <option value="mobile" className="bg-black">
+                        MOBILE_SYS
+                      </option>
+                    </select>
+                  </motion.div>
+                </div>
+
+                <motion.div variants={itemVariants} className="space-y-2">
+                  <label
+                    className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
+                    htmlFor="message"
+                  >
+                    <CaretRight size={12} weight="bold" /> 03_Briefing
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    className="w-full border border-primary/20 bg-primary/5 p-4 text-sm font-medium text-white transition-all focus:border-primary/60 focus:outline-none"
+                    placeholder="ENTER MISSION PARAMETERS..."
+                    required
+                  />
+                </motion.div>
+
+                <motion.button
+                  type="submit"
+                  disabled={state.submitting}
+                  whileHover={{
+                    backgroundColor: "var(--primary)",
+                    color: "#000",
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex w-full items-center justify-between border border-primary p-5 text-[11px] font-black tracking-[0.4em] uppercase transition-colors"
+                >
+                  <span className="flex items-center gap-3 italic">
+                    <Cpu size={22} />{" "}
+                    {state.submitting ? "SENDING..." : "TRANSMIT"}
+                  </span>
+                  <PaperPlaneTilt size={22} weight="bold" />
+                </motion.button>
+              </form>
+            </div>
+
+            {/* RIGHT: STATUS PANEL */}
+            <div className="relative flex flex-col items-center justify-center border-primary/10 bg-primary/[0.02] p-8 lg:w-[280px] lg:border-l">
+              <div className="relative h-32 w-32">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="absolute inset-0 rounded-full border border-dashed border-primary/20"
+                />
+                <motion.div
+                  animate={{ rotate: -360 }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                  className="absolute inset-4 rounded-full border border-primary/10"
+                >
+                  <div className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-primary shadow-[0_0_10px_#10b981]" />
+                </motion.div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Target size={34} className="text-primary/20" />
+                </div>
+              </div>
+
+              <div className="mt-8 w-full space-y-4">
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[8px] font-black uppercase opacity-40">
+                    <span>Uplink</span>
+                    <span>99.2%</span>
+                  </div>
+                  <div className="h-[2px] w-full overflow-hidden bg-primary/10">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "99.2%" }}
+                      className="h-full bg-primary"
+                    />
+                  </div>
+                </div>
+                <div className="text-[7px] leading-relaxed font-bold text-primary/30 uppercase italic">
+                  &gt; STATUS_OPTIMAL
+                  <br />
+                  &gt; NODE_KUOPIO_ACTIVE
+                  <br />
+                  &gt; AWAITING_ENCRYPT
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* --- FORM CONTENT (Z-INDEX 10) --- */}
-      <div className="relative z-10">
-        <div className="mb-8 flex items-center gap-4 border-b-2 border-primary/20 pb-4">
-          <TerminalWindow size={32} weight="bold" />
-          <div>
-            <h1 className="text-3xl font-black tracking-tighter uppercase">
-              Secure_Uplink_v3.0
-            </h1>
-            <p className="text-[10px] font-bold tracking-widest text-primary/40 uppercase">
-              Encrypted Channel: Alexandru_Paduret //{" "}
-              {isHovered ? "UPLINK_LIVE" : "Freelance_Inquiry"}
-            </p>
-          </div>
-        </div>
-
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-6 md:grid-cols-2"
-        >
-          {/* User Identity Section */}
-          <div className="space-y-4">
-            <div className="flex flex-col gap-2">
-              <label
-                className="text-[10px] font-black uppercase opacity-60"
-                htmlFor="email"
-              >
-                01_Origin_Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                className="border-2 border-primary/30 bg-background/70 p-3 text-sm backdrop-blur-sm transition-all focus:border-primary focus:outline-none"
-                placeholder="operator@company.com"
-                required
-              />
-              <ValidationError
-                prefix="Email"
-                field="email"
-                errors={state.errors}
-                className="text-[9px] text-red-500"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label
-                className="text-[10px] font-black uppercase opacity-60"
-                htmlFor="subject"
-              >
-                02_Mission_Objective
-              </label>
-              <select
-                id="subject"
-                name="subject"
-                className="border-2 border-primary/30 bg-background/70 p-3 text-sm uppercase backdrop-blur-sm transition-all focus:border-primary focus:outline-none"
-              >
-                <option value="full-stack">Full-Stack Development</option>
-                <option value="mobile-app">Cross-Platform Mobile</option>
-                <option value="consulting">System Architecture</option>
-                <option value="legacy-support">Legacy System Refactor</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label
-                className="text-[10px] font-black uppercase opacity-60"
-                htmlFor="budget"
-              >
-                03_Estimated_Resources
-              </label>
-              <input
-                id="budget"
-                name="budget"
-                className="border-2 border-primary/30 bg-background/70 p-3 text-sm backdrop-blur-sm focus:border-primary focus:outline-none"
-                placeholder="e.g. $2k - $5k / Timeline: 1mo"
-              />
-            </div>
-          </div>
-
-          {/* Message Section */}
-          <div className="flex flex-col gap-2">
-            <label
-              className="text-[10px] font-black uppercase opacity-60"
-              htmlFor="message"
-            >
-              04_Detailed_Brief
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={8}
-              className="flex-1 border-2 border-primary/30 bg-background/70 p-3 text-sm backdrop-blur-sm transition-all focus:border-primary focus:outline-none"
-              placeholder="Initialize detailed project parameters..."
-              required
-            />
-            <ValidationError
-              prefix="Message"
-              field="message"
-              errors={state.errors}
-              className="text-[9px] text-red-500"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <motion.button
-              type="submit"
-              disabled={state.submitting}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative flex w-full items-center justify-center gap-4 bg-primary p-4 font-black text-black uppercase transition-all hover:bg-white disabled:opacity-50"
-            >
-              <PaperPlaneTilt size={20} weight="bold" />
-              <span>Transmit_Uplink.exe</span>
-
-              <div className="absolute inset-0 opacity-0 transition-all group-hover:-inset-1 group-hover:opacity-100">
-                <div className="absolute top-0 left-0 size-2 border-t-2 border-l-2 border-primary" />
-                <div className="absolute top-0 right-0 size-2 border-t-2 border-r-2 border-primary" />
-                <div className="absolute bottom-0 left-0 size-2 border-b-2 border-l-2 border-primary" />
-                <div className="absolute right-0 bottom-0 size-2 border-r-2 border-b-2 border-primary" />
-              </div>
-            </motion.button>
-
-            {/* --- NEW EMAIL CLAUSE SECTION --- */}
-            <div className="mt-8 flex flex-col items-center space-y-4 border-t border-primary/10 pt-8 text-center">
-              <div className="flex w-full items-center gap-4">
-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                <span className="text-[10px] font-bold tracking-[0.3em] uppercase opacity-40">
-                  OR_DIRECT_ACCESS
-                </span>
-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-              </div>
-
-              <p className="text-xs tracking-tight opacity-70">
-                Prefer standard protocol? Contact terminal directly via:
-              </p>
-
-              <a
-                href="mailto:alexandru.paduret@proton.me"
-                className="group relative text-sm font-black tracking-widest text-primary transition-all hover:tracking-[0.2em]"
-              >
-                <span className="relative z-10">
-                  alexandru.paduret@proton.me
-                </span>
-                <div className="absolute -bottom-1 left-0 h-[1px] w-0 bg-primary transition-all group-hover:w-full" />
-              </a>
-            </div>
-
-            <div className="mt-8 flex justify-between text-[8px] font-bold opacity-30">
-              <span>STK: FORMSPREE_API_v2</span>
-              <span>ENCRYPTION: AES-256-TUI</span>
-              <span>LOC: FIN_KUOPIO</span>
-            </div>
-          </div>
-        </form>
-      </div>
+      <footer className="flex items-center justify-between border-t border-primary/10 bg-primary/5 px-8 py-4">
+        <span className="text-[9px] font-black tracking-widest opacity-70">
+          ALEXANDRU.PADURET@PROTON.ME
+        </span>
+        <span className="hidden text-[8px] font-black italic opacity-20 sm:block">
+          DIRECT_FREQ_01
+        </span>
+      </footer>
     </section>
   )
 }
