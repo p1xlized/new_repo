@@ -2,7 +2,7 @@ export const TRACKS = [
   {
     id: "01",
     title: "they will dance on our graves.mp3",
-    src: "/audio/they_will_dance.mp3",
+    src: "/aseets/music/grave.mp3",
     size: "8.4MB",
     bpm: 124,
     dur: "03:42",
@@ -11,11 +11,11 @@ export const TRACKS = [
   {
     id: "02",
     title: "LakeCityQuietPills.wav",
-    src: "/audio/lake_city.wav",
+    src: "/assets/music/16.01.26.mp3",
     size: "42.1MB",
     bpm: 90,
     dur: "04:15",
-    cover: "https://media.giphy.com/media/l41lTjJptO9D5sm8o/giphy.gif",
+    cover: "/assets/cover_art/rick.gif",
   },
   {
     id: "03",
@@ -24,7 +24,7 @@ export const TRACKS = [
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/mech.gif",
   },
   {
     id: "04",
@@ -33,16 +33,16 @@ export const TRACKS = [
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/skull.gif",
   },
   {
     id: "05",
     title: "game_03_soul_bleacher.mp3",
-    src: "/audio/soul_bleacher.mp3",
+    src: "/assets/music/bleach.mp3",
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/spin.gif",
   },
   {
     id: "06",
@@ -51,7 +51,7 @@ export const TRACKS = [
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/wave.webp",
   },
   {
     id: "07",
@@ -60,7 +60,7 @@ export const TRACKS = [
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/keyboard.gif",
   },
   {
     id: "08",
@@ -69,6 +69,6 @@ export const TRACKS = [
     size: "64.0MB",
     bpm: 60,
     dur: "12:00",
-    cover: "https://media.giphy.com/media/ko7twHhomhk8E/giphy.gif",
+    cover: "/assets/cover_art/mesmer.gif",
   },
 ]

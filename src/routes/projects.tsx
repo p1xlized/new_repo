@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { AnimatePresence, motion } from "framer-motion"
 import {
@@ -22,6 +22,7 @@ import { projects } from "@/data/projects"
 import { Button } from "@/components/ui/button"
 import { hideNavbar, showNavbar } from "@/lib/store"
 import { cn } from "@/lib/utils"
+import { useBrowserTab } from "@/lib/BrowserTab"
 
 // Loaders
 import { DataUplink, SystemLoader } from "@/components/Loader"
@@ -119,21 +120,22 @@ export default function ProjectsPage() {
   const [isBooting, setIsBooting] = useState(true)
   const [isUplinking, setIsUplinking] = useState(false)
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [pendingId, setPendingId] = useState<number | null>(null)
   const [loaderMode, setLoaderMode] = useState<"uplink" | "downlink">("uplink")
-  const [filter, setFilter] = useState<string>("ALL")
+  const [filter, setFilter] = useState("ALL")
   const [currentIndex, setCurrentIndex] = useState(0)
   const [time, setTime] = useState("")
-  const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null)
+  const pendingRef = useRef<number | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date().toLocaleTimeString("en-GB", { hour12: false }))
-    }, 1000)
-    return () => clearInterval(timer)
-  }, [])
+  const activeTabSection = selectedId ? projects[selectedId]?.title : "PROJECTS"
 
-  const activeProject = projects.find((p) => p.id === selectedId)
+  useBrowserTab({
+    section: activeTabSection,
+    appSuffix: "x_x",
+    switchInterval: 2000,
+    spinnerInterval: 150,
+  })
+
   const filteredProjects = useMemo(
     () =>
       filter === "ALL" ? projects : projects.filter((p) => p.tag === filter),
@@ -141,27 +143,28 @@ export default function ProjectsPage() {
   )
 
   const handleProjectSelect = (id: number | null) => {
-    setPendingId(id)
+    pendingRef.current = id
     setLoaderMode(id === null ? "downlink" : "uplink")
     setIsUplinking(true)
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background font-mono text-foreground selection:bg-primary/30">
-      {/* GLOBAL HUD */}
-      <div className="pointer-events-none fixed inset-0 z-50 hidden flex-col justify-between p-12 antialiased md:flex lg:p-16">
-        <div className="flex flex-row items-start justify-between">
+    <div className="relative min-h-screen bg-background font-mono text-foreground selection:bg-primary/30">
+      {/* ================= HUD ================= */}
+      <div className="pointer-events-none fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-12 md:p-16">
+        {/* Top Bar */}
+        <div className="flex items-start justify-between">
           <div className="flex flex-col gap-1">
             {selectedId ? (
               <button
                 onClick={() => handleProjectSelect(null)}
-                className="group pointer-events-auto flex items-center gap-4 transition-all"
+                className="b pointer-events-auto flex items-center gap-4 rounded-md p-3 text-left hover:border-primary hover:bg-primary/[0.06] active:scale-[0.98] sm:p-4"
               >
-                <div className="flex h-10 w-10 items-center justify-center border border-primary/20 bg-primary/5 transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-background">
+                <div className="flex h-10 w-10 items-center justify-center border border-primary/30 bg-primary/10">
                   <CaretLeft size={20} weight="bold" />
                 </div>
-                <div className="flex flex-col items-start">
-                  <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase group-hover:text-foreground">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-black tracking-[0.2em] text-primary uppercase">
                     Return_to_Archive
                   </span>
                   <span className="text-[7px] text-primary/40 uppercase">
@@ -170,38 +173,32 @@ export default function ProjectsPage() {
                 </div>
               </button>
             ) : (
-              <div className="flex flex-col">
-                <span className="text-[10px] leading-none tracking-[0.4em] text-primary uppercase">
-                  SCTR_COORDS: 62.8925° N, 27.6770° E
-                </span>
-                <span className="mt-1 text-[8px] text-muted-foreground uppercase opacity-40">
-                  INDEX_ROOT_VERIFIED
-                </span>
+              <div className="text-[10px] text-primary uppercase">
+                SCTR_COORDS: 62.8925° N, 27.6770° E
               </div>
             )}
           </div>
-          <div className="flex flex-col items-end">
-            <span className="animate-pulse text-[10px] tracking-[0.4em] text-primary italic">
-              {selectedId ? "DATA_STREAM_ACTIVE" : "UPLINK_STABLE"}
-            </span>
-            <p className="text-[12px] text-foreground tabular-nums">{time}</p>
+
+          <div className="text-right text-[10px] text-primary italic">
+            {selectedId ? "DATA_STREAM_ACTIVE" : "UPLINK_STABLE"} <br />
+            <span className="text-[12px] tabular-nums">{time}</span>
           </div>
         </div>
-        <div className="flex items-end justify-between">
-          <span className="text-[10px] tracking-[0.5em] text-primary uppercase">
+
+        {/* Bottom Bar */}
+        <div className="mt-auto flex items-end justify-between text-[10px] text-primary uppercase">
+          <span>
             PIXLIZED_OS_v1.0.4 // {selectedId ? "EXPLORER" : "ARCHIVE"}
           </span>
-          <div className="flex items-center gap-3 text-primary">
+          <div className="flex items-center gap-2">
             <ShieldCheck size={16} weight="bold" />
-            <span className="text-[10px] uppercase opacity-60">
-              Secure_Uplink
-            </span>
+            <span className="opacity-60">Secure_Uplink</span>
           </div>
         </div>
       </div>
 
-      {/* LOADERS */}
-      <AnimatePresence mode="wait">
+      {/* ================= LOADERS ================= */}
+      <AnimatePresence>
         {isBooting && (
           <SystemLoader key="boot" onComplete={() => setIsBooting(false)} />
         )}
@@ -210,65 +207,57 @@ export default function ProjectsPage() {
             key="uplink-transition"
             mode={loaderMode}
             onComplete={() => {
-              setSelectedId(pendingId)
+              setSelectedId(pendingRef.current)
               setIsUplinking(false)
               setCurrentIndex(0)
-              if (containerRef) containerRef.scrollTo(0, 0)
+              containerRef.current?.scrollTo({ top: 0 })
             }}
           />
         )}
       </AnimatePresence>
 
-      {/* CONTENT */}
+      {/* ================= MAIN CONTENT ================= */}
       {!isBooting && !isUplinking && (
         <div
-          ref={setContainerRef}
-          className="hide-scrollbar relative z-10 h-screen w-full overflow-y-auto scroll-smooth"
+          ref={containerRef}
+          className="relative z-10 h-screen overflow-y-auto scroll-smooth px-4 pt-28 pb-24 sm:px-6 md:px-10"
         >
-          <div className="mx-auto w-full max-w-6xl px-5 pt-20 pb-24 md:px-10 md:pt-44">
+          <div className="mx-auto max-w-7xl">
             <AnimatePresence mode="wait">
               {!selectedId ? (
-                <motion.section
+                <motion.div
                   key="archive-grid"
-                  initial={{ opacity: 0, x: -10, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: 10, filter: "blur(4px)" }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className="space-y-6"
                 >
-                  <header className="relative flex flex-col gap-8 border-b border-primary/20 pb-10 md:flex-row md:items-end md:justify-between">
-                    <div className="relative space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 animate-pulse bg-primary" />
-                        <span className="text-[10px] tracking-[0.5em] text-primary/60 uppercase">
-                          Archive_System // v1.0.4
-                        </span>
-                      </div>
-                      <h1 className="text-4xl tracking-tighter text-primary uppercase md:text-6xl">
-                        PROJECTS REPOSITORY
-                      </h1>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
+                  {/* HEADER + FILTER */}
+                  <div className="flex flex-col gap-6 border-b border-primary/20 pb-8 text-center md:flex-row md:items-end md:justify-between md:text-left">
+                    <h1 className="mx-auto text-4xl tracking-tighter text-primary uppercase sm:text-5xl md:mx-0 md:text-6xl">
+                      PROJECTS REPOSITORY
+                    </h1>
+                    <div className="flex flex-wrap justify-center gap-2 md:justify-start">
                       {["ALL", "WEB", "GAME", "MOBILE"].map((label) => (
-                        <button
+                        <Button
                           key={label}
                           onClick={() => setFilter(label)}
                           className={cn(
-                            "group relative border px-6 py-2 transition-all duration-300",
+                            "text-[10px] tracking-[0.3em] uppercase",
                             filter === label
                               ? "border-primary bg-primary text-background shadow-[0_0_20px_rgba(var(--primary),0.3)]"
                               : "border-primary/20 bg-primary/5 text-primary/40 hover:border-primary/60 hover:text-primary"
                           )}
                         >
-                          <span className="relative z-10 text-[10px] tracking-[0.3em] uppercase">
-                            {label}
-                          </span>
-                        </button>
+                          {label}
+                        </Button>
                       ))}
                     </div>
-                  </header>
+                  </div>
 
+                  {/* PROJECT GRID */}
                   <motion.div
-                    className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6"
+                    className="grid grid-cols-1 justify-center gap-4 sm:grid-cols-2 sm:gap-6"
                     variants={{
                       show: { transition: { staggerChildren: 0.05 } },
                     }}
@@ -276,90 +265,81 @@ export default function ProjectsPage() {
                     animate="show"
                   >
                     {filteredProjects.map((p, i) => (
-                      <ProjectCard
-                        key={p.id}
-                        project={p}
-                        index={i}
-                        onSelect={handleProjectSelect}
-                      />
+                      <motion.div key={p.id} layout>
+                        <ProjectCard
+                          project={p}
+                          index={i}
+                          onSelect={handleProjectSelect}
+                        />
+                      </motion.div>
                     ))}
                   </motion.div>
-                </motion.section>
+                </motion.div>
               ) : (
-                <motion.section
+                // DETAIL VIEW
+                <motion.div
                   key={`detail-${selectedId}`}
-                  initial={{ opacity: 0, x: 20, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: -20, filter: "blur(10px)" }}
-                  className="space-y-8 md:space-y-16"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
                 >
-                  <div className="mb-4 flex md:hidden">
-                    <button
-                      onClick={() => handleProjectSelect(null)}
-                      className="group flex items-center gap-3 text-primary uppercase"
-                    >
-                      <div className="flex h-8 w-8 items-center justify-center border border-primary/20 bg-primary/5 transition-all group-hover:bg-primary group-hover:text-background">
-                        <CaretLeft size={16} weight="bold" />
-                      </div>
-                      <span className="text-[10px] font-bold tracking-[0.2em]">
-                        BACK_TO_ARCHIVE
-                      </span>
-                    </button>
-                  </div>
-                  {activeProject && (
-                    <ProjectDetailView
-                      project={activeProject}
-                      currentIndex={currentIndex}
-                      setCurrentIndex={setCurrentIndex}
-                    />
-                  )}
-                </motion.section>
+                  <ProjectDetailView
+                    project={projects.find((p) => p.id === selectedId)!}
+                    currentIndex={currentIndex}
+                    setCurrentIndex={setCurrentIndex}
+                  />
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
       )}
-
-      <style>{`
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   )
 }
-
 const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
-  // --- NAVBAR CONTROL LOGIC ---
+  // --- INDEPENDENT NAVBAR CONTROL ---
   useEffect(() => {
-    // Hide navbar when this project detail is mounted
-    hideNavbar()
+    // Check if functions exist to avoid crashing if called outside the main layout
+    const safeHide = () => typeof hideNavbar === "function" && hideNavbar()
+    const safeShow = () => typeof showNavbar === "function" && showNavbar()
 
-    // Cleanup function: Show navbar when the user leaves the project detail
+    safeHide()
+
+    // The cleanup function is the most critical part for "going back"
     return () => {
-      showNavbar()
+      safeShow()
     }
-  }, []) // Empty dependency array ensures this only runs on mount/unmount
+  }, []) // Empty dependency array ensures this is tied strictly to the component lifecycle
 
-  const nextImage = () =>
+  // --- SAFE NAVIGATION LOGIC ---
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setCurrentIndex((prev: number) => (prev + 1) % project.imgs.length)
-  const prevImage = () =>
+  }
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setCurrentIndex(
       (prev: number) => (prev - 1 + project.imgs.length) % project.imgs.length
     )
+  }
 
   const getEmbedUrl = (url: string) => {
     if (!url) return ""
     const regExp =
       /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
     const match = url.match(regExp)
-    return match && match[2].length === 11
-      ? `https://www.youtube.com/embed/${match[2]}?autoplay=0&rel=0&modestbranding=1`
+    const videoId = match && match[2].length === 11 ? match[2] : null
+
+    return videoId
+      ? `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`
       : url
   }
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 selection:bg-primary/30">
-      {/* HEADER: SECTOR IDENTIFICATION */}
+      {/* HEADER */}
       <header className="relative flex flex-col items-center justify-center space-y-6 pt-2 pb-0 text-center">
         <div className="absolute top-0 left-1/2 hidden -translate-x-1/2 gap-64 opacity-30 md:flex">
           <div className="h-6 w-6 border-t-2 border-l-2 border-primary" />
@@ -371,11 +351,9 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-4 font-mono text-[10px] tracking-[0.6em] text-primary/60 uppercase"
         >
-          <span className="text-primary/20">{"[::]"}</span>
           <span>
-            RECORDS_ARCHIVE_0x{project.id.toString().padStart(2, "0")}
+            RECORDS_ARCHIVE_0x{project.id?.toString().padStart(2, "0")}
           </span>
-          <span className="text-primary/20">{"[::]"}</span>
         </motion.div>
 
         <h2 className="max-w-5xl text-2xl tracking-tight text-foreground uppercase sm:text-4xl lg:text-6xl">
@@ -383,10 +361,10 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
         </h2>
 
         <div className="flex flex-wrap justify-center gap-3">
-          {project.tech.split(",").map((t: string, i: number) => (
+          {project.tech?.split(",").map((t: string, i: number) => (
             <span
               key={i}
-              className="border border-primary/30 bg-primary/[0.03] px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-foreground uppercase transition-colors hover:bg-primary/10"
+              className="border border-primary/30 bg-primary/[0.03] px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-foreground uppercase hover:bg-primary/10"
             >
               {t.trim()}
             </span>
@@ -395,28 +373,25 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
       </header>
 
       <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-        {/* LEFT COLUMN: VISUAL ENGINE */}
+        {/* VISUAL ENGINE */}
         <div className="space-y-12 lg:col-span-7">
           <div className="group relative overflow-hidden border border-primary/20 bg-primary/[0.02] shadow-2xl">
+            {/* HUD Overlay */}
             <div className="pointer-events-none absolute inset-0 z-20 border-[8px] border-transparent p-4">
               <div className="flex h-full w-full flex-col justify-between border border-primary/10 p-2">
                 <div className="flex justify-between text-[8px] font-bold text-primary/40">
                   <span>REC_00:0{currentIndex}</span>
                   <span>720P_60FPS</span>
                 </div>
-                <div className="flex justify-between text-[8px] font-bold text-primary/40">
-                  <span>SENSOR_ACTIVE</span>
-                  <span>0x{project.id}FF</span>
-                </div>
               </div>
             </div>
 
             {project.is_video && project.video_url ? (
-              <div className="relative aspect-video w-full overflow-hidden">
+              <div className="relative aspect-video w-full">
                 <iframe
                   src={getEmbedUrl(project.video_url)}
                   title={project.title}
-                  className="absolute inset-0 h-full w-full opacity-95 brightness-[0.95] contrast-[1.1]"
+                  className="absolute inset-0 h-full w-full opacity-95"
                   allowFullScreen
                 />
               </div>
@@ -434,19 +409,25 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
                 >
                   <CaretRight size={32} weight="bold" />
                 </button>
-                <motion.img
-                  key={currentIndex}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 0.9, scale: 1 }}
-                  src={project.imgs[currentIndex]}
-                  className="h-full w-full object-cover grayscale-[0.2]"
-                  alt="Project Metadata"
-                />
+
+                {/* Independent Image Animation */}
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.9 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    src={project.imgs[currentIndex]}
+                    className="h-full w-full object-cover"
+                    alt="Project Metadata"
+                  />
+                </AnimatePresence>
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-20" />
           </div>
 
+          {/* Features */}
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <span className="font-mono text-xs font-black tracking-widest text-primary/60 uppercase">
@@ -454,12 +435,11 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
               </span>
               <div className="h-[1px] flex-1 bg-primary/20" />
             </div>
-
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {project.features.map((feature: string, idx: number) => (
+              {project.features?.map((feature: string, idx: number) => (
                 <li
                   key={idx}
-                  className="group relative flex items-center gap-4 border border-primary/10 bg-foreground/[0.02] p-5 transition-all hover:border-primary/40 hover:bg-primary/[0.02]"
+                  className="group relative flex items-center gap-4 border border-primary/10 bg-foreground/[0.02] p-5"
                 >
                   <span className="font-mono text-xs font-bold text-primary">
                     {idx + 1}.
@@ -467,14 +447,13 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
                   <span className="text-[13px] font-black tracking-wide text-foreground uppercase">
                     {feature}
                   </span>
-                  <div className="absolute top-0 right-0 h-2 w-2 border-t border-r border-primary/20 transition-all group-hover:border-primary" />
                 </li>
               ))}
             </ul>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: ANALYTICS & DEPLOYMENT */}
+        {/* ANALYTICS */}
         <div className="space-y-12 lg:col-span-5">
           <section className="relative space-y-10 border-l-2 border-primary/30 py-4 pl-10">
             <div className="space-y-4">
@@ -484,13 +463,13 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
                   Project_Manifesto
                 </h3>
               </div>
-              <p className="text-base leading-relaxed font-bold text-foreground/80 lg:text-lg">
+              <p className="text-base leading-relaxed font-bold text-foreground/80">
                 {project.description}
               </p>
             </div>
 
             <div className="space-y-6">
-              {project.metrics.map((metric: any, idx: number) => (
+              {project.metrics?.map((metric: any, idx: number) => (
                 <div key={idx} className="space-y-3">
                   <div className="flex justify-between font-mono text-[10px] font-black text-foreground/50 uppercase">
                     <span>{metric.label}</span>
@@ -499,52 +478,16 @@ const ProjectDetailView = ({ project, currentIndex, setCurrentIndex }: any) => {
                   <div className="relative h-2 w-full bg-primary/10">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${metric.value}%` }}
-                      transition={{ duration: 2, ease: "circOut" }}
-                      className="h-full bg-primary shadow-[0_0_10px_var(--primary)]"
+                      whileInView={{ width: `${metric.value}%` }} // Using whileInView makes it independent of the page load
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.5, ease: "circOut" }}
+                      className="h-full bg-primary"
                     />
                   </div>
                 </div>
               ))}
             </div>
           </section>
-
-          <div className="flex flex-col gap-4">
-            <Button className="group relative h-16 rounded-none bg-primary px-8 text-xs font-black tracking-[0.8em] text-background hover:bg-primary/90">
-              <span className="relative z-10">INITIALIZE_PREVIEW</span>
-              <div className="absolute inset-0 h-full w-0 bg-white/10 transition-all group-hover:w-full" />
-            </Button>
-
-            {project.git && (
-              <Button
-                asChild
-                variant="outline"
-                className="h-16 rounded-none border-primary/20 bg-transparent text-xs font-black tracking-[0.5em] text-foreground hover:border-primary hover:bg-primary/5"
-              >
-                <a href={project.git} target="_blank" rel="noreferrer">
-                  GIT_CORE_ACCESS
-                </a>
-              </Button>
-            )}
-          </div>
-
-          {project.awards && (
-            <div className="flex flex-col gap-4 border-t border-primary/10 pt-4">
-              <span className="font-mono text-[9px] font-bold tracking-[0.3em] text-primary/40 uppercase">
-                Recognition_Log:
-              </span>
-              <div className="flex flex-wrap gap-4">
-                {project.awards.map((award: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <Trophy size={16} className="text-primary" />
-                    <span className="border-b border-primary/30 font-mono text-[10px] font-extrabold text-foreground uppercase">
-                      {award.title}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

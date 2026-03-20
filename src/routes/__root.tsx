@@ -4,7 +4,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools"
 
 import appCss from "../styles.css?url"
 import Navbar from "@/components/Navbar"
-import { CustomCursor } from "@/components/Coursor" // Import your component
+import { CustomCursor } from "@/components/Coursor"
 
 export const Route = createRootRoute({
   head: () => ({
@@ -27,6 +27,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       {/* Added cursor-none here to hide the system pointer everywhere */}
       <body className="md:cursor-none">
         <CustomCursor />
+
         <Navbar />
         {children}
 

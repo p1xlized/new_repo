@@ -26,10 +26,10 @@ const UI_DATA = {
   profile: {
     name: "Alexandru Paduret",
     location: "p1xlized",
-    image: "/assets/imgs/avatar.jpg",
+    image: "https://avatars.githubusercontent.com/u/72890769?v=4",
     tagline: "CORE_IDENTITY_VERIFIED",
     about:
-      "Full-stack architect specializing in high-performance systems and reactive interfaces. Currently bridging the gap between neural aesthetics and functional code.",
+      "Full-stack architect building fast systems and reactive interfaces. A jack-of-all-trades who’s surprisingly good at all of them, blending creativity and code.",
   },
   socials: [
     {

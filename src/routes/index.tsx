@@ -16,6 +16,7 @@ import {
 import Profile from "@/components/Profile"
 import { SystemLoader } from "@/components/Loader"
 import ContactSection from "@/components/ContactMe"
+import { useBrowserTab } from "@/lib/BrowserTab"
 
 export const Route = createFileRoute("/")({ component: App })
 
@@ -50,8 +51,17 @@ function App() {
       }
     }
   }
+  useBrowserTab({
+    section: activeSection,
+    appSuffix: "x_x",
+    switchInterval: 2000, // Switch frames every 2 sec
+    spinnerInterval: 150, // Spinner animation interval
+  })
 
-  // Detect screen size
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 5000)
+    return () => clearTimeout(t)
+  }, [])
   useEffect(() => {
     const updateScreen = () => {
       const w = window.innerWidth
@@ -123,7 +133,7 @@ function App() {
                   SCTR_COORDS: 62.89° N
                 </span>
                 <span className="block text-[8px] text-primary/40">
-                  NODE_KUOPIO_STABLE
+                  NODE_6x66_STABLE
                 </span>
               </div>
               <div className="space-y-1 border-r border-primary/50 pr-4 text-right">
@@ -226,6 +236,7 @@ function App() {
               className={`relative flex w-full ${screen === "mobile" ? "min-h-[auto] flex-col py-16" : "h-screen snap-start items-center justify-center overflow-hidden"}`}
             >
               {screen !== "mobile" && <SystemGridBackground />}
+
               <Profile />
             </section>
 
@@ -234,6 +245,7 @@ function App() {
               className={`relative flex w-full px-4 ${screen === "mobile" ? "flex-col py-16" : "h-screen snap-start items-center justify-center overflow-hidden"}`}
             >
               {screen !== "mobile" && <SolarSystemBackground />}
+
               <div className="relative z-20 w-full max-w-4xl">
                 <ContactSection />
               </div>

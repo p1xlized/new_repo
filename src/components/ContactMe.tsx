@@ -22,7 +22,7 @@ const UI_DATA = {
     { value: "game", label: "ENGINE" },
   ],
   contact: {
-    email: "alex@pixlized.net",
+    email: "contact-me@pixlized.net",
   },
 }
 
@@ -131,7 +131,7 @@ export default function ContactUplink() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[12px] tracking-[0.3em] text-primary uppercase">
+          <label className="text-base tracking-[0.3em] text-primary uppercase">
             Data_Payload
           </label>
           <textarea
@@ -139,7 +139,7 @@ export default function ContactUplink() {
             required
             rows={3}
             placeholder="INITIALIZE_TRANSMISSION_SEQUENCE..."
-            className="w-full resize-none border-b border-border bg-transparent py-2 font-mono text-base text-foreground transition-all outline-none placeholder:text-muted-foreground/30 focus:border-primary focus:bg-primary/5"
+            className="w-full resize-none border-b border-border bg-transparent py-2 font-mono text-base text-foreground transition-all outline-none placeholder:text-foreground focus:border-primary focus:bg-primary/5"
           />
         </div>
 
@@ -174,10 +174,10 @@ export default function ContactUplink() {
               <Broadcast size={20} />
             </div>
             <div className="flex flex-col">
-              <span className="text-[8px] tracking-[0.3em] text-muted-foreground uppercase">
-                Direct_Vector
+              <span className="text-base tracking-[0.3em] text-muted-foreground uppercase">
+                Direct_Contact
               </span>
-              <span className="text-xs text-foreground">
+              <span className="text-lg text-foreground">
                 {UI_DATA.contact.email}
               </span>
             </div>

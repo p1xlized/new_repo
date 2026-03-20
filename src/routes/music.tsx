@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react"
 import MusicLoader from "@/components/MusicLoader"
 import { TRACKS } from "@/data/music"
+import { useMusicTab } from "@/lib/BrowserTab"
 
 /**
  * Animated Background Decoration
@@ -248,6 +249,13 @@ function MusicPage() {
   const [activeTrack, setActiveTrack] = useState(TRACKS[0])
   const [volume, setVolume] = useState(80)
   const [view, setView] = useState<"list" | "details">("list")
+
+  useMusicTab({
+    isPlaying,
+    songTitle: activeTrack.title,
+    appSuffix: "x_x",
+    visualizerInterval: 200,
+  })
 
   const handleTrackSelect = (track: (typeof TRACKS)[0]) => {
     setActiveTrack(track)

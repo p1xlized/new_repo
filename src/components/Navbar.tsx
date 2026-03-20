@@ -5,6 +5,7 @@ import { useStore } from "@tanstack/react-store"
 import { AnimatePresence, motion } from "framer-motion"
 import * as react from "@phosphor-icons/react"
 import { useLocation, useNavigate } from "@tanstack/react-router"
+import { Moon, Sun } from "@phosphor-icons/react"
 import { navbarStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 
@@ -341,34 +342,31 @@ export const Navbar = () => {
             {/* The Bare Switch */}
             <button
               onClick={toggleTheme}
-              className="relative flex h-5 items-center px-2 transition-opacity active:scale-95"
+              className="relative flex h-8 items-center px-3 transition-opacity select-none active:scale-95"
             >
-              <div className="relative h-1.5 w-10 rounded-full border border-primary/20 bg-primary/5">
+              {/* Track */}
+              <div className="relative h-2.5 w-14 rounded-full border border-primary/20 bg-primary/5">
+                {/* Sliding knob */}
                 <motion.div
-                  animate={{ x: theme === "dark" ? 0 : 24 }}
+                  animate={{
+                    x: theme === "dark" ? 0 : 56 - 20, // Track width (56px) - Knob width (20px)
+                  }}
                   transition={{ type: "spring", stiffness: 400, damping: 28 }}
                   className={cn(
-                    "absolute top-0.5 h-0.5 w-3 shadow-[0_0_8px_var(--primary)]",
+                    "absolute top-0 left-0 h-2.5 w-5 rounded-full shadow-[0_0_8px_var(--primary)]",
                     theme === "dark" ? "bg-primary" : "bg-primary/80"
                   )}
                 />
               </div>
-              <div
-                className={cn(
-                  "absolute left-0 size-0.5 rounded-full",
-                  theme === "dark"
-                    ? "bg-primary shadow-[0_0:5px_var(--primary)]"
-                    : "bg-primary/10"
+
+              {/* Icon */}
+              <div className="ml-2 text-primary">
+                {theme === "dark" ? (
+                  <Moon size={14} weight="fill" className="animate-pulse" />
+                ) : (
+                  <Sun size={14} weight="fill" className="animate-pulse" />
                 )}
-              />
-              <div
-                className={cn(
-                  "absolute right-0 size-0.5 rounded-full",
-                  theme === "light"
-                    ? "bg-primary shadow-[0_0:5px_var(--primary)]"
-                    : "bg-primary/10"
-                )}
-              />
+              </div>
             </button>
 
             <RecordingAperture className="hidden md:flex" />
