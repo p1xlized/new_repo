@@ -1,231 +1,220 @@
 "use client"
 
+import React from "react"
 import { useForm } from "@formspree/react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import {
-  PaperPlaneTilt,
-  TerminalWindow,
-  Target,
-  CaretRight,
+  ArrowRight,
+  CaretDown,
   Cpu,
-  ShieldCheck,
-  CheckCircle,
+  EnvelopeSimple,
+  Fingerprint,
+  Radioactive,
+  Broadcast,
+  CornersOut,
 } from "@phosphor-icons/react"
 
-export const ContactSection = () => {
+const UI_DATA = {
+  protocols: [
+    { value: "fullstack", label: "FULL_STACK" },
+    { value: "backend", label: "BACKEND" },
+    { value: "mobile", label: "MOBILE" },
+    { value: "game", label: "ENGINE" },
+  ],
+  contact: {
+    email: "alex@pixlized.net",
+  },
+}
+
+export default function ContactUplink() {
   const [state, handleSubmit] = useForm("YOUR_FORMSPREE_ID")
 
-  const itemVariants = {
-    hidden: { x: -5, opacity: 0 },
-    visible: { x: 0, opacity: 1 },
-  }
-
   return (
-    <section className="bg-card/40 relative mx-auto w-full border border-primary/10 p-4 font-mono text-primary shadow-2xl backdrop-blur-xl">
-      {/* --- UNIFIED PROFILE-STYLE DECORATIONS --- */}
-      {/* TOP-LEFT DATA STREAM */}
-      <div className="absolute -top-[1px] left-4 flex items-center gap-2 md:left-8">
-        <div className="h-[2px] w-8 bg-primary shadow-[0_0_10px_var(--primary)] md:w-12" />
-        <span className="text-[6px] font-black tracking-[0.2em] text-primary/60 md:text-[7px] md:tracking-[0.3em]">
-          UPLINK_ESTABLISHED
-        </span>
-      </div>
-
-      {/* SIDE FRAME BRACES - Hidden on Mobile */}
-      <div className="absolute inset-y-8 -left-[1px] hidden w-[1px] bg-gradient-to-b from-transparent via-primary/40 to-transparent md:block" />
-      <div className="absolute inset-y-8 -right-[1px] hidden w-[1px] bg-gradient-to-b from-transparent via-primary/40 to-transparent md:block" />
-
-      {/* BOTTOM-RIGHT INDEX */}
-      <div className="absolute right-4 -bottom-[1px] flex items-center gap-2 md:right-8">
-        <span className="text-[6px] font-black tracking-[0.2em] text-primary/60 md:text-[7px] md:tracking-[0.3em]">
-          TRNSMSN_V1.0.4
-        </span>
-        <div className="h-[2px] w-8 bg-primary shadow-[0_0_10px_var(--primary)] md:w-12" />
-      </div>
-      {/* --------------------------------------- */}
-
-      <AnimatePresence mode="wait">
-        {state.succeeded ? (
-          <motion.div
-            key="success"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-2 flex h-[450px] flex-col items-center justify-center p-6 text-center"
-          >
-            <CheckCircle
-              size={60}
-              weight="duotone"
-              className="mb-4 animate-pulse"
+    <motion.div
+      whileHover={{ scale: 0.995 }}
+      className="group relative w-full max-w-xl overflow-hidden border border-primary/40 bg-background/60 p-8 text-left transition-all hover:border-primary md:p-12"
+    >
+      {/* --- 1. BACKGROUND ANIMATIONS --- */}
+      <div className="absolute top-1/2 left-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 opacity-[0.03] transition-opacity duration-700 group-hover:opacity-10">
+        <motion.svg
+          viewBox="0 0 100 100"
+          className="h-full w-full text-foreground"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r="47"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.5"
+          />
+          {[...Array(6)].map((_, i) => (
+            <ellipse
+              key={`lat-${i}`}
+              cx="50"
+              cy="50"
+              rx="47"
+              ry={8 + i * 8}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="0.15"
             />
-            <h2 className="text-2xl font-black tracking-tighter uppercase italic">
-              Uplink_Confirmed
-            </h2>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-6 border border-primary px-6 py-2 text-[10px] font-black transition-all hover:bg-primary hover:text-black"
-            >
-              RESTART_TERMINAL
-            </button>
-          </motion.div>
-        ) : (
-          <div className="flex flex-col lg:flex-row">
-            {/* LEFT: FORM SECTION */}
-            <div className="flex-1 p-6 sm:p-8 md:p-12">
-              <header className="mb-8 flex items-center justify-between border-b border-primary/10 pb-4">
-                <div className="flex items-center gap-2">
-                  <TerminalWindow size={20} weight="fill" />
-                  <h1 className="text-lg font-black tracking-tighter uppercase italic">
-                    Secure_Uplink
-                  </h1>
-                </div>
-                <div className="flex items-center gap-2 text-[9px] font-bold opacity-50">
-                  <ShieldCheck size={14} /> <span>SSL_ACTIVE</span>
-                </div>
-              </header>
-
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                  <motion.div variants={itemVariants} className="space-y-2">
-                    <label
-                      className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
-                      htmlFor="email"
-                    >
-                      <CaretRight size={12} weight="bold" /> 01_Origin
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      name="email"
-                      className="w-full border-b border-primary/20 bg-transparent py-1 text-sm font-bold text-white transition-all placeholder:opacity-10 focus:border-primary focus:outline-none"
-                      placeholder="USER@DOMAIN.COM"
-                      required
-                    />
-                  </motion.div>
-
-                  <motion.div variants={itemVariants} className="space-y-2">
-                    <label
-                      className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
-                      htmlFor="subject"
-                    >
-                      <CaretRight size={12} weight="bold" /> 02_Protocol
-                    </label>
-                    <select
-                      id="subject"
-                      name="subject"
-                      className="w-full border-b border-primary/20 bg-transparent py-1 text-sm font-bold text-white focus:border-primary focus:outline-none"
-                    >
-                      <option value="dev" className="bg-black">
-                        FULL_STACK
-                      </option>
-                      <option value="sys" className="bg-black">
-                        ARCHITECTURE
-                      </option>
-                      <option value="mobile" className="bg-black">
-                        MOBILE_SYS
-                      </option>
-                    </select>
-                  </motion.div>
-                </div>
-
-                <motion.div variants={itemVariants} className="space-y-2">
-                  <label
-                    className="flex items-center gap-2 text-[10px] font-black tracking-widest text-primary/70 uppercase"
-                    htmlFor="message"
+          ))}
+        </motion.svg>
+      </div>
+      <div className="relative z-20 mb-10 flex items-start justify-between">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xl text-foreground uppercase">
+              Contact Me
+            </span>
+            <span className="border border-border bg-muted px-1.5 py-0.5 text-[7px] text-muted-foreground">
+              V4.0.5_SEC
+            </span>
+          </div>
+          <div className="text-[9px] tracking-widest text-muted-foreground uppercase">
+            V_2.0 // Net_Deployment: PIXL_01
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <CornersOut
+            size={24}
+            className="text-muted-foreground/40 transition-all group-hover:rotate-90 group-hover:text-primary"
+          />
+          <span className="text-[6px] tracking-[0.3em] text-foreground uppercase">
+            Secure_Comm
+          </span>
+        </div>
+      </div>
+      {/* --- 3. TRANSMISSION FORM --- */}
+      <form onSubmit={handleSubmit} className="relative z-20 space-y-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-[12px] tracking-[0.3em] text-primary uppercase">
+              Email
+            </label>
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="IDENTITY@NODE"
+              className="w-full border-b border-border bg-transparent py-2 font-mono text-base text-foreground transition-all outline-none placeholder:text-foreground/60 focus:border-primary focus:bg-primary/5"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-[12px] tracking-[0.3em] text-primary uppercase">
+              Type
+            </label>
+            <div className="relative">
+              <select
+                name="protocol"
+                className="w-full appearance-none border-b border-border bg-transparent py-2 font-mono text-base text-foreground outline-none focus:border-primary"
+              >
+                {UI_DATA.protocols.map((p) => (
+                  <option
+                    key={p.value}
+                    value={p.value}
+                    className="bg-background text-foreground"
                   >
-                    <CaretRight size={12} weight="bold" /> 03_Briefing
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    className="w-full border border-primary/20 bg-primary/5 p-4 text-sm font-medium text-white transition-all focus:border-primary/60 focus:outline-none"
-                    placeholder="ENTER MISSION PARAMETERS..."
-                    required
-                  />
-                </motion.div>
-
-                <motion.button
-                  type="submit"
-                  disabled={state.submitting}
-                  whileHover={{
-                    backgroundColor: "var(--primary)",
-                    color: "#000",
-                  }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex w-full items-center justify-between border border-primary p-5 text-[11px] font-black tracking-[0.4em] uppercase transition-colors"
-                >
-                  <span className="flex items-center gap-3 italic">
-                    <Cpu size={22} />{" "}
-                    {state.submitting ? "SENDING..." : "TRANSMIT"}
-                  </span>
-                  <PaperPlaneTilt size={22} weight="bold" />
-                </motion.button>
-              </form>
-            </div>
-
-            {/* RIGHT: STATUS PANEL */}
-            <div className="relative flex flex-col items-center justify-center border-primary/10 bg-primary/[0.02] p-8 lg:w-[280px] lg:border-l">
-              <div className="relative h-32 w-32">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-0 rounded-full border border-dashed border-primary/20"
-                />
-                <motion.div
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-4 rounded-full border border-primary/10"
-                >
-                  <div className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-primary shadow-[0_0_10px_#10b981]" />
-                </motion.div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Target size={34} className="text-primary/20" />
-                </div>
-              </div>
-
-              <div className="mt-8 w-full space-y-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[8px] font-black uppercase opacity-40">
-                    <span>Uplink</span>
-                    <span>99.2%</span>
-                  </div>
-                  <div className="h-[2px] w-full overflow-hidden bg-primary/10">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: "99.2%" }}
-                      className="h-full bg-primary"
-                    />
-                  </div>
-                </div>
-                <div className="text-[7px] leading-relaxed font-bold text-primary/30 uppercase italic">
-                  &gt; STATUS_OPTIMAL
-                  <br />
-                  &gt; NODE_KUOPIO_ACTIVE
-                  <br />
-                  &gt; AWAITING_ENCRYPT
-                </div>
-              </div>
+                    /{p.label}_LINK
+                  </option>
+                ))}
+              </select>
+              <CaretDown
+                size={14}
+                className="absolute top-1/2 right-0 -translate-y-1/2 text-muted-foreground"
+              />
             </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
 
-      <footer className="flex items-center justify-between border-t border-primary/10 bg-primary/5 px-8 py-4">
-        <span className="text-[9px] font-black tracking-widest opacity-70">
-          ALEXANDRU.PADURET@PROTON.ME
-        </span>
-        <span className="hidden text-[8px] font-black italic opacity-20 sm:block">
-          DIRECT_FREQ_01
-        </span>
-      </footer>
-    </section>
+        <div className="space-y-2">
+          <label className="text-[12px] tracking-[0.3em] text-primary uppercase">
+            Data_Payload
+          </label>
+          <textarea
+            name="message"
+            required
+            rows={3}
+            placeholder="INITIALIZE_TRANSMISSION_SEQUENCE..."
+            className="w-full resize-none border-b border-border bg-transparent py-2 font-mono text-base text-foreground transition-all outline-none placeholder:text-muted-foreground/30 focus:border-primary focus:bg-primary/5"
+          />
+        </div>
+
+        <motion.button
+          type="submit"
+          disabled={state.submitting}
+          className="group/btn relative flex w-full items-center justify-between border border-border bg-secondary/50 px-6 py-5 transition-all hover:bg-primary hover:text-primary-foreground disabled:opacity-30"
+        >
+          <div className="flex items-center gap-4">
+            <Cpu
+              size={24}
+              className="transition-transform duration-700 group-hover/btn:rotate-180"
+            />
+            <span className="text-xs tracking-[0.5em] uppercase">
+              {state.submitting ? "Uploading" : "Execute_Transmit"}
+            </span>
+          </div>
+          <ArrowRight
+            size={20}
+            className="transition-transform group-hover/btn:translate-x-2"
+          />
+        </motion.button>
+      </form>
+      {/* --- 4. DIRECT UPLINK SECTION --- */}
+      <div className="relative z-20 mt-10 border-t border-border pt-8">
+        <a
+          href={`mailto:${UI_DATA.contact.email}`}
+          className="group/email flex items-center justify-between border border-border bg-muted/30 p-4 transition-all hover:border-primary/40 hover:bg-muted"
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground group-hover/email:text-primary">
+              <Broadcast size={20} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[8px] tracking-[0.3em] text-muted-foreground uppercase">
+                Direct_Vector
+              </span>
+              <span className="text-xs text-foreground">
+                {UI_DATA.contact.email}
+              </span>
+            </div>
+          </div>
+          <EnvelopeSimple
+            size={18}
+            className="text-muted-foreground transition-all group-hover/email:translate-x-1 group-hover/email:text-primary"
+          />
+        </a>
+      </div>
+      {/* --- 5. FOOTER --- */}
+      <div className="relative z-20 mt-8 flex items-center justify-between">
+        <div className="flex gap-8">
+          <div className="flex flex-col">
+            <span className="text-[7px] text-muted-foreground uppercase">
+              Signal
+            </span>
+            <span className="text-xs text-foreground">ENCRYPTED</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[7px] text-muted-foreground uppercase">
+              Status
+            </span>
+            <span className="text-xs text-foreground">0x00_READY</span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end">
+          <Fingerprint size={20} className="mb-1 text-muted-foreground/30" />
+          <div className="h-1 w-20 overflow-hidden bg-muted">
+            <motion.div
+              className="h-full bg-primary/40"
+              animate={{ x: ["-100%", "100%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+        </div>
+      </div>
+    </motion.div>
   )
 }

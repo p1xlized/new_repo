@@ -1,100 +1,147 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* TUI "Sage Console" - Light Mode */
-  /* A desaturated, mid-light greenish gray. Deeply matte and pleasant on eyes. */
-  --background: oklch(0.89 0.02 170);
-  --foreground: oklch(0.22 0.04 170);
-
-  /* Cards are slightly more "clay-like" to create a tactile UI */
-  --card: oklch(0.86 0.025 170);
-  --card-foreground: oklch(0.18 0.04 170);
-
-  --popover: oklch(0.91 0.02 170);
-  --popover-foreground: oklch(0.18 0.04 170);
-
-  /* A "Deep Forest Phosphor" - Stronger green presence but darker for legibility */
-  --primary: oklch(0.48 0.11 165);
-  --primary-foreground: oklch(0.98 0.01 170);
-
-  --secondary: oklch(0.82 0.03 170);
-  --secondary-foreground: oklch(0.25 0.04 170);
-
-  --muted: oklch(0.8 0.02 170);
-  --muted-foreground: oklch(0.42 0.04 170);
-
-  --accent: oklch(0.78 0.05 165);
-  --accent-foreground: oklch(0.18 0.04 170);
-
-  --destructive: oklch(0.5 0.15 25);
-
-  /* Borders look like "Etched Glass" in this light mode */
-  --border: oklch(0.25 0.04 170 / 18%);
-  --input: oklch(0.25 0.04 170 / 18%);
-  --ring: oklch(0.48 0.11 165);
-  --radius: 0rem;
+  --background: oklch(0.9842 0.0034 247.8575);
+  --foreground: oklch(0.3013 0.024 238.809);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.3193 0.0228 209.5983);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.3249 0.0245 200.142);
+  --primary: oklch(0.52 0.049 147.7951);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.9276 0.0058 264.5313);
+  --secondary-foreground: oklch(0.407 0.0296 173.182);
+  --muted: oklch(0.967 0.0029 264.5419);
+  --muted-foreground: oklch(0.3025 0.0164 156.1138);
+  --accent: oklch(0.9181 0.0477 145.1734);
+  --accent-foreground: oklch(0.4091 0.0226 200.5214);
+  --destructive: oklch(0.5664 0.2031 32.6994);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.8717 0.0093 258.3382);
+  --input: oklch(0.9163 0.025 143.4909);
+  --ring: oklch(0.7099 0.0954 147.5011);
+  --chart-1: oklch(0.85 0.15 180);
+  --chart-2: oklch(0.7 0.18 250);
+  --chart-3: oklch(0.8 0.2 65);
+  --chart-4: oklch(0.75 0.15 310);
+  --chart-5: oklch(0.6 0.12 150);
+  --sidebar: oklch(0.967 0.0029 264.5419);
+  --sidebar-foreground: oklch(0.3277 0.0256 195.975);
+  --sidebar-primary: oklch(0.52 0.049 147.7951);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.8971 0.047 146.1388);
+  --sidebar-accent-foreground: oklch(0.4109 0.0239 188.316);
+  --sidebar-border: oklch(0.8657 0.0288 199.3627);
+  --sidebar-ring: oklch(0.8758 0.0571 147.4218);
+  --font-sans: var(--font-mono);
+  --font-serif: var(--font-mono);
+  --font-mono: "JetBrains Mono", monospace;
+  --radius: 0.15rem;
 }
 
 .dark {
-  --background: oklch(0.16 0.025 175);
-  --foreground: oklch(0.92 0.04 165);
+  /* DEEP TERMINAL BLACK */
+  --background: oklch(0.12 0.01 260);
+  --foreground: oklch(0.98 0.01 180);
 
-  /* Lighter for card/window boxes to create depth */
-  --card: oklch(0.19 0.035 175);
-  --card-foreground: oklch(0.92 0.04 165);
+  /* GLASS SURFACES */
+  --card: oklch(0.15 0.015 260);
+  --card-foreground: oklch(0.98 0.01 180);
+  --popover: oklch(0.13 0.01 260);
+  --popover-foreground: oklch(0.9 0.05 180);
 
-  --popover: oklch(0.17 0.03 175);
-  --popover-foreground: oklch(0.92 0.04 165);
+  /* PHOSPHOR PRIMARY (Retained for Terminal Glow) */
+  --primary: oklch(0.8556 0.1555 179.7932);
+  --primary-foreground: oklch(0.12 0.01 260);
 
-  /* Primary remains that vibrant "Phosphor Glow" */
-  --primary: oklch(0.78 0.15 175);
-  --primary-foreground: oklch(0.15 0.05 180);
+  /* DATA TELEMETRY (Muted) */
+  --muted: oklch(0.18 0.02 260);
+  --muted-foreground: oklch(0.65 0.03 180);
 
-  /* Secondary is a very dark teal - perfect for subtle buttons */
-  --secondary: oklch(0.24 0.04 175);
-  --secondary-foreground: oklch(0.85 0.15 175);
+  /* ACCENT & INTERACTION */
+  --secondary: oklch(0.22 0.03 260);
+  --secondary-foreground: oklch(0.95 0.02 180);
+  --accent: oklch(0.25 0.05 180);
+  --accent-foreground: oklch(0.98 0.01 180);
 
-  --muted: oklch(0.22 0.03 175);
-  --muted-foreground: oklch(0.6 0.05 175);
+  /* WIREFRAME BORDERS */
+  --border: oklch(0.28 0.03 180 / 0.4);
+  --input: oklch(0.2 0.02 180);
+  --ring: oklch(0.8556 0.1555 179.7932);
 
-  /* Accent for selection/highlights */
-  --accent: oklch(0.28 0.06 175);
-  --accent-foreground: oklch(0.95 0.1 175);
+  /* SIDEBAR HUD */
+  --sidebar: oklch(0.1 0.01 260);
+  --sidebar-foreground: oklch(0.8 0.03 180);
+  --sidebar-primary: var(--primary);
+  --sidebar-border: oklch(0.2 0.02 180 / 0.5);
 
-  --destructive: oklch(0.55 0.22 28);
+  /* CRT GLOW SHADOWS */
+  --shadow-color: oklch(0.8556 0.1555 179.7932 / 0.12);
+  --shadow-2xl: 0px 0px 20px -5px var(--shadow-color);
 
-  /* Borders are slightly more visible now with the lighter bg */
-  --border: oklch(0.35 0.06 175 / 40%);
-  --input: oklch(0.35 0.06 175 / 40%);
-  --ring: oklch(0.78 0.15 175);
+  /* FONT OVERRIDES */
+  --font-sans: var(--font-mono);
+  --font-serif: var(--font-mono);
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 @theme inline {
-  --font-mono: "IBM Plex Mono", "JetBrains Mono", monospace;
-  --font-sans: "IBM Plex Mono", "JetBrains Mono", monospace;
-  --font-serif: "IBM Plex Mono", "JetBrains Mono", monospace;
-  /* ... rest of your mappings stay the same ... */
-  --color-primary: var(--primary);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
-  /* Hard edges for TUI */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+  --radius-lg: var(--radius);
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
+    /* Force monospace globally */
+    font-family: var(--font-mono) !important;
   }
   body {
-    @apply bg-background font-mono text-foreground antialiased;
+    @apply bg-background text-foreground transition-colors duration-500;
+  }
+
+  /* Sub-pixel text rendering for JetBrains Mono */
+  h1,
+  h2,
+  h3,
+  h4,
+  button,
+  p,
+  span {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.02em;
   }
 }
+
+/* Custom Cursor Logic */
 * {
-  transition-property: none !important;
+  cursor: none !important;
+}
+
+.no-js * {
+  cursor: auto;
 }
